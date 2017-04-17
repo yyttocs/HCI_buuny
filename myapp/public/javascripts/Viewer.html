@@ -1,0 +1,76 @@
+<html lang="en">
+	<head>
+		<title>3D Bunny</title>
+		<script type="text/javascript" src="webgl-utils.js"></script>
+    <script type="text/javascript" src="webgl-debug.js"></script>
+    <script type="text/javascript" src="cuon-utils.js"></script>
+    <script type="text/javascript" src="cuon-matrix.js"></script>
+    <script type="text/javascript" src="bunny.js"></script>
+    <script type="text/javascript" src="Viewer.js"></script>
+  </head>
+
+  <body onload="init()">
+  	<script id="vertexShader" type="x-shader/x-vertex">
+  		uniform mat4 Projection;
+  		uniform mat4 Model;
+  		uniform vec3 lightDirection;
+  		uniform vec3 lightColor;
+  		uniform vec3 objectColor;
+  		attribute vec4 vertexPosition;
+  		attribute vec3 vertexNormal;
+  		varying mediump vec3 fragmentColor;
+  		void main() {
+  			vec4 p = Model * vertexPosition;
+  			vec3 n = normalize(mat3(Model) * vertexNormal);
+  			vec3 l = normalize(mat3(Model) * lightDirection);
+  			vec3 v = normalize(vec3(-p));
+  			vec3 h = normalize(v + l);
+  			float d = max(dot(n,l), 0.0);
+  			float s = pow(max(dot(n,h), 0.0), 100.0);
+  			fragmentColor = lightColor * (objectColor * d + vec3(s));
+  			gl_Position = Projection * Model * vertexPosition;
+  		}
+  	</script>
+  	<script id="fragmentShader" type="x-shader/x-fragment">
+  		varying mediump vec3 fragmentColor;
+  		void main() {
+  			gl_FragColor = vec4(fragmentColor, 1.0);
+  		}
+  	</script>
+  	<canvas id="webgl" width="500px" height="500px" onmousedown="mouseDown(event)" 
+  																								  onmouseup="mouseUp(event)" 
+  																								  onmousemove="mouseMove(event)">
+  		Please use a browser supporting "canvas".
+  	</canvas>
+  	<table>
+      <tr>
+        <td>Translate down Z:</td>
+        <td>
+          <input id="zinput" type="range" min="0.0" max="15.0" step="0.1" oninput="transZ()">
+        </td>
+        <td id="zoutput"></td>
+      </tr>
+      <tr>
+        <td>Red:</td>
+        <td>
+          <input id="redinput" type="range" min="0.00" max="1.00" step="0.01" oninput="changeRed()">
+        </td>
+        <td id="redoutput"></td>
+      </tr>
+      <tr>
+        <td>Green:</td>
+        <td>
+          <input id="greeninput" type="range" min="0.00" max="1.00" step="0.01" oninput="changeGreen()">
+        </td>
+        <td id="greenoutput"></td>
+      </tr>
+      <tr>
+        <td>Blue:</td>
+        <td>
+          <input id="blueinput" type="range" min="0.00" max="1.00" step="0.01" oninput="changeBlue()">
+        </td>
+        <td id="blueoutput"></td>
+      </tr>
+    </table>
+ 	</body>
+</html>
